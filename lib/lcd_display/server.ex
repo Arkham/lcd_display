@@ -1,3 +1,5 @@
+# Datasheet: https://www.embeddedadventures.com/datasheets/LCD-1602_hw_v1_doc_v1.pdf
+
 defmodule LcdDisplay.Server do
   use GenServer
   use Bitwise
@@ -75,10 +77,12 @@ defmodule LcdDisplay.Server do
   end
 
   defp send_command(command, state) do
+    # 0x04 -> RS = 0, RW = 0, EN = 1
     send_with_mask(command, 0x04, state)
   end
 
   defp send_data(data, state) do
+    # 0x05 -> RS = 0, RW = 0, EN = 1
     send_with_mask(data, 0x05, state)
   end
 
@@ -88,7 +92,7 @@ defmodule LcdDisplay.Server do
     buffer = buffer ||| mask
     write_word(buffer, state)
     :timer.sleep(2)
-    buffer = buffer &&& 0xFB
+    buffer = buffer &&& 0xFB # 0xFB -> EN = 0
     write_word(buffer, state)
 
     # then send bits 3-0
@@ -96,7 +100,7 @@ defmodule LcdDisplay.Server do
     buffer = buffer ||| mask
     write_word(buffer, state)
     :timer.sleep(2)
-    buffer = buffer &&& 0xFB
+    buffer = buffer &&& 0xFB # 0xFB -> EN = 0
     write_word(buffer, state)
   end
 end
